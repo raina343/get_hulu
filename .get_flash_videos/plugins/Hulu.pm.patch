@@ -1,0 +1,15 @@
+--- Hulu.pm.orig	2012-09-21 11:07:30.813458009 -0400
++++ Hulu.pm	2012-09-21 10:39:11.000000000 -0400
+@@ -77,9 +77,9 @@
+     $cid = $1;
+     info "Found Hulu CID: $cid";
+   }
+-  if ($browser->content =~ m{<link rel="video_src" href="http://www.hulu.com/embed/([A-Za-z0-9_-]{22})" />}
+-    or $browser->content =~ m{<link rel="media:video" href="http://www.hulu.com/embed/([A-Za-z0-9_-]{22})" />}
+-    or $browser->content =~ m{video_src":\s*"http://www.hulu.com/embed/([A-Za-z0-9_-]{22})"}
++  if ($browser->content =~ m{<link rel="video_src" href="http://www.hulu.com/embed.html[?]eid([A-Za-z0-9_-]{22})" />}
++    or $browser->content =~ m{<link rel="media:video" href="http://www.hulu.com/embed.html[?]eid([A-Za-z0-9_-]{22})" />}
++    or $browser->content =~ m{video_src":\s*"http://www.hulu.com/embed.html[?]eid([A-Za-z0-9_-]{22})"}
+     or $browser->content =~ m{videoEmbedId = "([A-Za-z0-9_-]{22})"}
+     )
+   {
