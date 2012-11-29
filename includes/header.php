@@ -296,12 +296,17 @@ function dateDiff($start, $end) {
 			var searchbox = document.getElementById('searchbox').value
 			var poststr2="Search=true&value="+searchbox;
 			$.ajax({type: "POST",async:true,url: "programcontent.php",data: poststr2,success: function(html){$("#programcontent").empty();$("#programcontent").append(html);}});
-
-
-//			alert ('searching');
-//			document.form.NEXTPAGE.value='search_progs';
-//			document.form.PAGENO.value=1;
-//			document.form.submit();
+		}
+	}
+	function submitonEnter2(evt){
+		var charCode = (evt.which) ? evt.which : event.keyCode
+		if ( charCode == "13" ) {
+			var searchbox = document.getElementById('PVRSeries').value;
+			window.open("addseries.php?manual=true&showURL="+encodeURIComponent(searchbox));
+//			alert(searchbox);
+//			var searchbox = document.getElementById('searchbox').value
+//			var poststr2="Search=true&value="+searchbox;
+//			$.ajax({type: "POST",async:true,url: "programcontent.php",data: poststr2,success: function(html){$("#programcontent").empty();$("#programcontent").append(html);}});
 		}
 	}
 

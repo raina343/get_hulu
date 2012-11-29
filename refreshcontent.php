@@ -1,7 +1,8 @@
 <?
-header( 'Content-type: text/html; charset=utf-8' );
-include ("includes/config.php");
-include ("includes/header.php");
+//header( 'Content-type: text/html; charset=utf-8' );
+include_once ("includes/contenttype.php");
+include_once ("includes/config.php");
+include_once ("includes/header.php");
 	function objectToArray($object)
 	{
 		$array=array();
@@ -133,5 +134,7 @@ foreach ($Episodelist as $w){
 	print '<li>'.$w.'</li>';
 }
 print '<ul>';
+if ($runPVR=="1"){}else{
 print '<br><div class="action"><ul class="action"><li class="action"><a class="action" onclick="window.close()" title="Close">Close</a></li></ul></div>';
+}
 //print_r($Episodelist);
