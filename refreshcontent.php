@@ -14,7 +14,30 @@ include ("includes/header.php");
 //Get the latest Run Date
  // Start output buffer (if not enabled in php.ini)
 ob_start();
+$Episodelist = array();
 print '<P><strong>Refreshing Hulu Content.  Please wait.</strong><br>';
+//First Lets check to see what episodes we already have, that were pay only that may now be free
+//We're only going to do items in the PVR List, cos otherwise it could take forever as the library builds
+$dbQueryPVR = "SELECT * FROM PVRList";
+$resultPVR = mysql_query($dbQueryPVR) or die (mysql_error());
+while ($rowPVR = mysql_fetch_array($resultPVR)){
+	$dbQueryPVR2 = "SELECT * FROM ProgramData WHERE show_name='".$rowPVR['show_name']."' AND is_subscriber_only='1'";
+//	echo $dbQueryPVR2;
+	$resultPVR2 = mysql_query($dbQueryPVR2);
+	while ($rowPVR2 = mysql_fetch_array($resultPVR2)){
+		$QueryURL = "http://www.hulu.com/api/2.0/info/video.json?_user_pgid=1&_content_pgid=67&_device_id=1&type=video&id=".$rowPVR2['HuluID'];
+	        $handle = fopen($QueryURL, "rb");
+	        $contents = stream_get_contents($handle);
+	        fclose($handle);
+	        $results = json_decode($contents);
+		array_push($Episodelist,$results->show->name.' - '.$results->title);
+		if ($results->show->is_subscriber_only=="0"){
+			$dbQueryPVR3 = "Update ProgramData SET expires_at='".$results->expires_at."',available_at='".$results->available_at."',DateAdded='".date("Y-m-d H:i:s")."',is_subscriber_only='0' WHERE id='".$rowPVR2['id']."'";
+			$resultPVR3 = mysql_query($dbQueryPVR3) or die (mysql_error());
+		}
+	}
+}
+//exit;		
 $dbQuery = "SELECT * FROM DataPull ORDER BY DateRun DESC Limit 1";
 $result = mysql_query($dbQuery) or die (mysql_error());
 $LastRun = mysql_fetch_array($result);
@@ -28,17 +51,21 @@ while ($LastRunDate<date(U)){
 //Now that we have the range of dates to query, we'll loop through that array and populate the database.
 foreach ($runarray as $qq){
 	echo ".";
+echo "<PRE>";
 	ob_flush();
         flush();
 	$firstdate = date("c",$qq);
 	$seconddate = date("c",$qq+86400);
-	$url = "http://www.hulu.com/api/2.0/videos.json?free_only=1&order=desc&original_premiere_date_gte=".urlencode ($firstdate)."&original_premiere_date_lt=".urlencode($seconddate)."&sort=view_count_today&video_type=episode&items_per_page=256&position=0&_user_pgid=1&_content_pgid=67&_device_id=1";
+//	$url = "http://www.hulu.com/api/2.0/videos.json?free_only=1&order=desc&original_premiere_date_gte=".urlencode ($firstdate)."&original_premiere_date_lt=".urlencode($seconddate)."&sort=view_count_today&video_type=episode&items_per_page=256&position=0&_user_pgid=1&_content_pgid=67&_device_id=1";
+	$url = "http://www.hulu.com/api/2.0/videos.json?free_only=0&order=desc&original_premiere_date_gte=".urlencode ($firstdate)."&original_premiere_date_lt=".urlencode($seconddate)."&sort=view_count_today&video_type=episode&items_per_page=256&position=0&_user_pgid=1&_content_pgid=67&_device_id=1";
 //	echo $url."<br>";
 	$handle = fopen($url, "rb");
 	$contents = stream_get_contents($handle);
 	fclose($handle);
 	$results = json_decode($contents);
 	$Importantstuff = $results->data;
+//	print_r($Importantstuff);
+//exit;
 	foreach ($Importantstuff as $y){
 		$Data2 = $y->video;
 		$Data = objectToArray($Data2);
@@ -53,6 +80,7 @@ foreach ($runarray as $qq){
 		$result = mysql_query($dbQuery) or die (mysql_error());
 		$rows = mysql_num_rows($result);
 		if ($rows>0){}else {
+			array_push($Episodelist,$Data['show']['name'].' - '.$Data['title']);
 			$showcount++;
 			$dbQuery2 = "INSERT INTO ProgramData (HuluID,DateAdded) VALUES (";
 			$dbQuery2 .=" '".$Data['id']."','".date("Y-m-d H:i:s")."')";
@@ -95,7 +123,15 @@ foreach ($runarray as $qq){
 		}
 	}
 }
+
 $dbQuery5 = "INSERT INTO DataPull(DateRun) VALUES ('".date("Y-m-d")."')";
 $result5 = mysql_query($dbQuery5) or die (mysql_error());
 
 print '<br>Refresh Complete - '.$showcount.' new episodes added</br>';
+print '<ul>';
+foreach ($Episodelist as $w){
+	print '<li>'.$w.'</li>';
+}
+print '<ul>';
+print '<br><div class="action"><ul class="action"><li class="action"><a class="action" onclick="window.close()" title="Close">Close</a></li></ul></div>';
+//print_r($Episodelist);

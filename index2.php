@@ -17,11 +17,12 @@ function getlist(type,value,extra){
 $.ajax({type: "POST",async:true,url: "programcontent.php",data: poststr2,success: function(html){$("#programcontent").empty();$("#programcontent").append(html);}});
 }
 function quickrecord(){
-var url = document.getElementById('quickrecord').value;
-if (url==""){
-return false;
-}else {
-document.location.href="record.php?quick=true&id="+encodeURIComponent(url)+"&target='_blank'";
-}
+	var url = document.getElementById('quickrecord').value;
+	if (url==""){
+		return false;
+	}else {
+		document.getElementById('quickrecord').value='';
+		window.open("record.php?quick=true&id="+encodeURIComponent(url));
+	}
 }
 </script>
