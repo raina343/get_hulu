@@ -10,6 +10,7 @@ function dateDiff($start, $end) {
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <script src="includes/jquery.min.js" type="text/javascript"></script>
+<script class="jsbin" src="includes/jquery.dataTables.min.js"></script>
 <html><HEAD><TITLE>get_hulu Web PVR Manager v0.01</TITLE>
 <link rel="shortcut icon" href="favicon.ico" />
 <STYLE type="text/css">
@@ -127,6 +128,15 @@ function dateDiff($start, $end) {
 	A.info:hover		{ }
 
 	B.footer		{ font-size: 70%; color: #777; font-weight: normal; }
+	.even			{background: none repeat scroll 0 0 #444444;}
+	.even:hover			{background: none repeat scroll 0 0 #555555;}
+	.odd:hover			{background: none repeat scroll 0 0 #555555;}
+	.odd			{background: none repeat scroll 0 0 #444444;}
+
+@import "includes/demo_table.css";
+@import "includes/demo_page.css"; 
+@import "includes/header.ccss";
+@import "includes/demo_table.css";
 	</STYLE>
 </HEAD>
 
