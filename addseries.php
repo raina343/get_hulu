@@ -25,7 +25,7 @@ if ($_GET['manual']=="true"){
         fclose($handle);
         $results = json_decode($contents);
 //	echo "<PRE>";
-	//print_r($results);
+//	print_r($results);
 	$Importantstuff = $results->data;
 	$ShowName = $Importantstuff[0];
 	$ShowName = $ShowName->video->show->name;
@@ -94,6 +94,8 @@ if ($_GET['manual']=="true"){
                         $result = mysql_query($dbQuery3) or die (mysql_error());
                 }
         }
+echo "<br> Show Addition Completed";
+print '<br><div class="action"><ul class="action"><li class="action"><a class="action" onclick="window.close()" title="Close">Close</a></li></ul></div>';
 exit;
 }
 

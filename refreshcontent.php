@@ -1,5 +1,5 @@
 <?
-//header( 'Content-type: text/html; charset=utf-8' );
+header( 'Content-type: text/html; charset=utf-8' );
 include_once ("includes/contenttype.php");
 include_once ("includes/config.php");
 include_once ("includes/header.php");
@@ -15,30 +15,51 @@ include_once ("includes/header.php");
 //Get the latest Run Date
  // Start output buffer (if not enabled in php.ini)
 ob_start();
+ob_implicit_flush(true);
+ob_end_flush();
+ob_flush();
 $Episodelist = array();
 print '<P><strong>Refreshing Hulu Content.  Please wait.</strong><br>';
 //First Lets check to see what episodes we already have, that were pay only that may now be free
 //We're only going to do items in the PVR List, cos otherwise it could take forever as the library builds
 $dbQueryPVR = "SELECT * FROM PVRList";
 $resultPVR = mysql_query($dbQueryPVR) or die (mysql_error());
+echo "Refreshing PVR Shows for newly Free Content<br>";
+echo "<PRE>";
 while ($rowPVR = mysql_fetch_array($resultPVR)){
-	$dbQueryPVR2 = "SELECT * FROM ProgramData WHERE show_name='".$rowPVR['show_name']."' AND is_subscriber_only='1'";
-//	echo $dbQueryPVR2;
-	$resultPVR2 = mysql_query($dbQueryPVR2);
-	while ($rowPVR2 = mysql_fetch_array($resultPVR2)){
-		$QueryURL = "http://www.hulu.com/api/2.0/info/video.json?_user_pgid=1&_content_pgid=67&_device_id=1&type=video&id=".$rowPVR2['HuluID'];
+	$QueryURL = "http://www.hulu.com/api/2.0/videos.json?free_only=true&include_seasons=true&order=asc&shorter_cache=true&show_id=".$rowPVR['HuluShowID']."&sort=original_premiere_date&video_type%5B%5D=episode&video_type%5B%5D=game&items_per_page=6400&position=0&_user_pgid=1&_content_pgid=67&_device_id=1";
+		echo "Checking ".$rowPVR['show_name']."<br>";
+		ob_flush();
 	        $handle = fopen($QueryURL, "rb");
 	        $contents = stream_get_contents($handle);
 	        fclose($handle);
 	        $results = json_decode($contents);
-		array_push($Episodelist,$results->show->name.' - '.$results->title);
-		if ($results->show->is_subscriber_only=="0"){
-			$dbQueryPVR3 = "Update ProgramData SET expires_at='".$results->expires_at."',available_at='".$results->available_at."',DateAdded='".date("Y-m-d H:i:s")."',is_subscriber_only='0' WHERE id='".$rowPVR2['id']."'";
-			$resultPVR3 = mysql_query($dbQueryPVR3) or die (mysql_error());
+		$StuffIWant = $results->data;
+		$newshows = 0;
+		$removedshows = 0;
+		foreach ($StuffIWant as $y){
+			$id = $y->video->id;
+			$substatus = $y->video->is_subscriber_only;
+			$expires_at = $y->video->expires_at;
+			$available_at = $y->video->available_at;
+			if (($substatus=="")||($substatus=="0")){
+				$dbQueryPVR3 = "Update ProgramData SET expires_at='".$expires_at."',available_at='".$available_at."',is_subscriber_only='0' WHERE HuluID='".$id."'";
+				$resultPVR3 = mysql_query($dbQueryPVR3) or die (mysql_error());
+				if (mysql_affected_rows()==TRUE){
+					array_push($Episodelist,$y->video->show->name.' - '.$y->video->title);
+					$newshows++;
+				}
+			}else {
+				$dbQueryPVR3 = "Update ProgramData SET expires_at='".$expires_at."',available_at='".$available_at."',is_subscriber_only='1' WHERE HuluID='".$id."'";
+				$resultPVR3 = mysql_query($dbQueryPVR3) or die (mysql_error());
+				if (mysql_affected_rows()==TRUE){
+					$removedshows++;
+				}
+			}
 		}
-	}
+		echo "Added ".$newshows." and Removed ".$removedshows."<br>";
 }
-//exit;		
+//exit;
 $dbQuery = "SELECT * FROM DataPull ORDER BY DateRun DESC Limit 1";
 $result = mysql_query($dbQuery) or die (mysql_error());
 $LastRun = mysql_fetch_array($result);
@@ -50,14 +71,15 @@ while ($LastRunDate<date(U)){
 	$LastRunDate = $LastRunDate+86400;
 }
 //Now that we have the range of dates to query, we'll loop through that array and populate the database.
+echo "</PRE>";
+echo "Refreshing for new content<br>";
 foreach ($runarray as $qq){
 	echo ".";
-echo "<PRE>";
+	echo "<PRE>";
 	ob_flush();
         flush();
 	$firstdate = date("c",$qq);
 	$seconddate = date("c",$qq+86400);
-//	$url = "http://www.hulu.com/api/2.0/videos.json?free_only=1&order=desc&original_premiere_date_gte=".urlencode ($firstdate)."&original_premiere_date_lt=".urlencode($seconddate)."&sort=view_count_today&video_type=episode&items_per_page=256&position=0&_user_pgid=1&_content_pgid=67&_device_id=1";
 	$url = "http://www.hulu.com/api/2.0/videos.json?free_only=0&order=desc&original_premiere_date_gte=".urlencode ($firstdate)."&original_premiere_date_lt=".urlencode($seconddate)."&sort=view_count_today&video_type=episode&items_per_page=256&position=0&_user_pgid=1&_content_pgid=67&_device_id=1";
 //	echo $url."<br>";
 	$handle = fopen($url, "rb");
@@ -66,7 +88,6 @@ echo "<PRE>";
 	$results = json_decode($contents);
 	$Importantstuff = $results->data;
 //	print_r($Importantstuff);
-//exit;
 	foreach ($Importantstuff as $y){
 		$Data2 = $y->video;
 		$Data = objectToArray($Data2);
@@ -133,7 +154,7 @@ print '<ul>';
 foreach ($Episodelist as $w){
 	print '<li>'.$w.'</li>';
 }
-print '<ul>';
+print '</ul>';
 if ($runPVR=="1"){}else{
 print '<br><div class="action"><ul class="action"><li class="action"><a class="action" onclick="window.close()" title="Close">Close</a></li></ul></div>';
 }
