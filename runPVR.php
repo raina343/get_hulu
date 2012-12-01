@@ -2,7 +2,7 @@
 include_once ("includes/contenttype.php");
 include_once ("includes/config.php");
 include_once ("includes/header.php");
-include_once ("recordfunction.php");
+include_once ("includes/recordfunction.php");
 $runPVR = "1";
 //First check to see if the cache
 include ("refreshcontent.php");

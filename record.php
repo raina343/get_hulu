@@ -2,7 +2,7 @@
 header( 'Content-type: text/html; charset=utf-8' );
 include ("includes/header.php");
 include ("includes/config.php");
-include ("recordfunction.php");
+include ("includes/recordfunction.php");
 $dbQuery = "SELECT * FROM ProgramData WHERE id='".$_GET['id']."'";
 $result = mysql_query($dbQuery) or die (mysql_error());
 $row = mysql_fetch_array($result);
