@@ -35,5 +35,7 @@ if ($_GET['quick']=="true"){
 }
 print '</ul><br />';
 recordshow ($Huluid);
+
+print '<br><div class="action"><ul class="action"><li class="action"><a class="action" onclick="window.close()" title="Close">Close</a></li></ul></div>';
 ?>
 

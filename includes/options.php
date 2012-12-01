@@ -1,28 +1,13 @@
 
 <input type="hidden" name="AUTOPVRRUN" value="4"  /><input type="hidden" name="NEXTPAGE" value="search_progs"  /></form><form method="post" action="/" enctype="multipart/form-data" name="form">
-<table class="options_outer"><tr class="options_outer"><td class="options_outer" rowspan="3" id="tab_BASICTAB" style="display: table-cell; visibility: visible;"><table class="options"><tr class="options"><th class="options" title="Enter your partial text match (or regex expression)">Search</th><td class="options" title="Enter your partial text match (or regex expression)"><input type="text" name="SEARCH" id="searchbox" value=".*" size="20" onkeydown="return submitonEnter(event);" class="options" /></td></tr> <tr class="options"><th class="options" title="Select which column you wish to search">Search in</th><td class="options" title="Select which column you wish to search"><select name="SEARCHFIELDS"  onchange id="option_SEARCHFIELDS" class="options">
-<option value="index">Index</option>
-<option value="thumbnail">Image</option>
-<option value="pid">Pid</option>
-<option value="available">Availability</option>
-<option value="type">Type</option>
-<option selected="selected" value="name">Name</option>
-<option value="episode">Episode</option>
-<option value="versions">Versions</option>
-<option value="duration">Duration</option>
-<option value="desc">Description</option>
-<option value="channel">Channel</option>
-<option value="categories">Categories</option>
-<option value="timeadded">Time Added</option>
-<option value="guidance">Guidance</option>
-<option value="web">Web Page</option>
-<option value="seriesnum">Series Number</option>
-<option value="episodenum">Episode Number</option>
-<option value="filename">Filename</option>
-<option value="mode">Mode</option>
-<option value="name,episode">Name+Episode</option>
-<option value="name,episode,desc">Name+Episode+Desc</option>
-</select></td></tr> 
+<table class="options_outer"><tr class="options_outer"><td class="options_outer" rowspan="3" id="tab_BASICTAB" style="display: table-cell; visibility: visible;"><table class="options"><tr class="options"><th class="options" title="Enter your partial text match (or regex expression)">Search</th><td class="options" title="Enter your partial text match (or regex expression)">
+<?
+print '<input type="text" name="SEARCH" id="searchbox" value=".*" size="20" ';
+print ' onkeyup="search(this.value);" ';
+//print 'onkeydown="return submitonEnter(event);"';
+print ' class="options" />';
+?>
+</td></tr> 
 <tr class="options"><th class="options" title="Select the programme types you wish to search">Add Series to PVR</th><td class="options"><table class="options_embedded" border="0">
 
 <tr class="options_embedded"><td><input title="Enter a Hulu Show page URL to add that show to the PVR and download all available program information" onkeydown="return submitonEnter2(event);" class="options" type="text" name="PVRSeries" id="PVRSeries" size="36"></td></tr></table>

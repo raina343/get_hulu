@@ -55,6 +55,7 @@ $(document).ready(function() {
 });
         var foo = innerHTML='<input type="checkbox">';
         $('#PCRList').dataTable( {
+		"aaSorting": [[12,'desc']],
 		"sDom": '<"top"iflp<"clear">>rt<"bottom"iflp<"clear">>',
                 "bPaginate": true,
                 "bLengthChange": true,
@@ -90,7 +91,7 @@ null,
 		null,
 		null,
             ],
-                "bFilter": false,
+                "bFilter": true,
                 "bInfo": false,
                 "bAutoWidth": false,
                 "sAjaxSource": "getprogramcontent.php?gettable=true",
@@ -104,6 +105,11 @@ function getlist(type,value,extra){
 		var poststr2="Sort=true&SortBy="+value+"&direction="+extra;
 	}
 $.ajax({type: "POST",async:true,url: "programcontent.php",data: poststr2,success: function(html){$("#programcontent").empty();$("#programcontent").append(html);}});
+}
+function search(value){
+//alert(value);
+var oTable = $('#PCRList').dataTable();
+oTable.fnFilter( value );
 }
 function quickrecord(){
 	var url = document.getElementById('quickrecord').value;
