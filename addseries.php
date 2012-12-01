@@ -24,8 +24,6 @@ if ($_GET['manual']=="true"){
         $contents = stream_get_contents($handle);
         fclose($handle);
         $results = json_decode($contents);
-//	echo "<PRE>";
-//	print_r($results);
 	$Importantstuff = $results->data;
 	$ShowName = $Importantstuff[0];
 	$ShowName = $ShowName->video->show->name;
@@ -33,7 +31,7 @@ if ($_GET['manual']=="true"){
 	print '<P><Strong>Adding show '.$ShowName.' to PVR</strong>';
 	$dbQuery2 = "DELETE FROM PVRList WHERE show_name='".$ShowName."'";
 	$result2 = mysql_query($dbQuery2) or die (mysql_error());
-	$dbQuery3 = "INSERT INTO PVRList (show_name,DateAdded) VALUES ('".$ShowName."','".date("Y-m-d H:i:s")."')";
+	$dbQuery3 = "INSERT INTO PVRList (show_name,DateAdded,HuluShowID) VALUES ('".$ShowName."','".date("Y-m-d H:i:s")."','".$show_id."')";
 	$result3 = mysql_query($dbQuery3) or die (mysql_error());
 	//Now grab all available episodes for this show and add them to the show database (ignore duplicates)
 	foreach ($Importantstuff as $y){
@@ -46,7 +44,6 @@ if ($_GET['manual']=="true"){
                 unset($Data['video_game_id']);
                 unset($Data['video_game']);
                 $dbQuery = "SELECT * FROM ProgramData WHERE HuluID = '".$Data['id']."'";
-//		echo $dbQuery;
                 echo ".";
                 $result = mysql_query($dbQuery) or die (mysql_error());
                 $rows = mysql_num_rows($result);
@@ -90,7 +87,6 @@ if ($_GET['manual']=="true"){
                                 $dbQuery3 = substr($dbQuery3,0,-1);
                         }
                         $dbQuery3 .=" WHERE HuluID='".$Data['id']."'";
-//			echo $dbQuery3."<br>";
                         $result = mysql_query($dbQuery3) or die (mysql_error());
                 }
         }
@@ -99,13 +95,13 @@ print '<br><div class="action"><ul class="action"><li class="action"><a class="a
 exit;
 }
 
-$dbQuery = "SELECT show_name FROM ProgramData WHERE id='".$_GET['id']."'";
+$dbQuery = "SELECT showid,show_name FROM ProgramData WHERE id='".$_GET['id']."'";
 $result = mysql_query($dbQuery) or die (mysql_error());
 $row = mysql_fetch_array($result);
 print '<P><Strong>Adding show '.$row['show_name'].' to PVR</strong>';
 
 $dbQuery2 = "DELETE FROM PVRList WHERE show_name='".$row['show_name']."'";
 $result2 = mysql_query($dbQuery2) or die (mysql_error());
-$dbQuery3 = "INSERT INTO PVRList (show_name,DateAdded) VALUES ('".$row['show_name']."','".date("Y-m-d H:i:s")."')";
+$dbQuery3 = "INSERT INTO PVRList (show_name,DateAdded,HuluShowID) VALUES ('".$row['show_name']."','".date("Y-m-d H:i:s")."','".$row['showid']."')";
 $result3 = mysql_query($dbQuery3) or die (mysql_error());
 

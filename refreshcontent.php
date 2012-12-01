@@ -3,15 +3,13 @@ header( 'Content-type: text/html; charset=utf-8' );
 include_once ("includes/contenttype.php");
 include_once ("includes/config.php");
 include_once ("includes/header.php");
-	function objectToArray($object)
-	{
-		$array=array();
-		foreach($object as $member=>$data)
-		{
-			$array[$member]=$data;
-		}
-		return $array;
+function objectToArray($object){
+	$array=array();
+	foreach($object as $member=>$data){
+		$array[$member]=$data;
 	}
+	return $array;
+}
 //Get the latest Run Date
  // Start output buffer (if not enabled in php.ini)
 ob_start();
@@ -78,7 +76,7 @@ foreach ($runarray as $qq){
 	echo "<PRE>";
 	ob_flush();
         flush();
-	$firstdate = date("c",$qq);
+	$firstdate = date("c",$qq-86400);
 	$seconddate = date("c",$qq+86400);
 	$url = "http://www.hulu.com/api/2.0/videos.json?free_only=0&order=desc&original_premiere_date_gte=".urlencode ($firstdate)."&original_premiere_date_lt=".urlencode($seconddate)."&sort=view_count_today&video_type=episode&items_per_page=256&position=0&_user_pgid=1&_content_pgid=67&_device_id=1";
 //	echo $url."<br>";
